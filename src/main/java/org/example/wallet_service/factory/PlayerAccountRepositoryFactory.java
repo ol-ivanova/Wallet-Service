@@ -8,7 +8,7 @@ public class PlayerAccountRepositoryFactory {
     private PlayerAccountRepositoryFactory(){}
 
     public static PlayerAccountRepository getPlayerAccountRepository(){
-        if(playerAccountRepository == null){
+        if (playerAccountRepository == null){
             playerAccountRepository = new PlayerAccountRepository();
         }
         return playerAccountRepository;

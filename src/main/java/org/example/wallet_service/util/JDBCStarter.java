@@ -11,14 +11,14 @@ public final class JDBCStarter {
                                        id SERIAL PRIMARY KEY,
                                        name VARCHAR(50) NOT NULL,
                                        username VARCHAR(50) NOT NULL UNIQUE,
-                                       password VARCHAR(30) NOT NULL/** ? */
+                                       password VARCHAR(30) NOT NULL
             
             );
             
             CREATE TABLE IF NOT EXISTS wallet_schema.player_audit (
                                          id SERIAL PRIMARY KEY,
                                          date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                         action VARCHAR(50) NOT NULL, /** ? */
+                                         action VARCHAR(50) NOT NULL,
                                          player_id INT REFERENCES wallet_schema.player(id)
             
             );
@@ -45,7 +45,7 @@ public final class JDBCStarter {
     private JDBCStarter() {
     }
 
-    public static void prepareDateBase(){
+    public static void initDateBase(){
         try (Connection connection = ConnectionManager.open();
              Statement statement = connection.createStatement()) {
             statement.execute(CREATE_SQL);

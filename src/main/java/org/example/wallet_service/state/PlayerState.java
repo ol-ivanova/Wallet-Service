@@ -26,12 +26,12 @@ public class PlayerState implements ConsoleState{
     public PlayerState(Integer playerId){
         scanner = ConsoleFactory.getScanner();
         playerAccountService = PlayerAccountServiceFactory.getPlayerAccountService();
-        this.playerId = playerId;
         playerAuditService = PlayerAuditServiceFactory.getPlayerAuditService();
+        this.playerId = playerId;
     }
     @Override
     public void process() {
-        PlayerAccount playerAccount = playerAccountService.getAccountByPlayerID(playerId);
+        PlayerAccount playerAccount = playerAccountService.getAccountByPlayerId(playerId);
 
         System.out.println("1. Операции по счету\n2. Просмотр аудита\n3. Выход");
 
@@ -40,16 +40,19 @@ public class PlayerState implements ConsoleState{
             case 1 -> nextState = new PlayerAccountState(playerAccount.getAccountNumber());
             case 2 -> nextState = new PlayerAuditState(playerId);
             case 3 -> {
-                PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
-                        .playerId(playerId)
-                        .auditAction(AuditAction.LOGOUT)
-                        .build();
-                playerAuditService.createLog(playerAuditDto);
+                createAuditLog();
                 nextState = new MainState();
             }
             default -> throw new IllegalStateException("Неправильное значение " + menuSelection);
-
         };
+    }
+
+    private void createAuditLog() {
+        PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
+                .playerId(playerId)
+                .auditAction(AuditAction.LOGOUT)
+                .build();
+        playerAuditService.createLog(playerAuditDto);
     }
 
     @Override

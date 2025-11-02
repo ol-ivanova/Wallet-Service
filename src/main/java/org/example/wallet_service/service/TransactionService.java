@@ -2,8 +2,7 @@ package org.example.wallet_service.service;
 
 import org.example.wallet_service.domain.dto.TransactionDto;
 import org.example.wallet_service.domain.entity.Transaction;
-import org.example.wallet_service.exceptions.PlayerException;
-import org.example.wallet_service.exceptions.TransferException;
+import org.example.wallet_service.exception.TransferException;
 import org.example.wallet_service.factory.TransactionRepositoryFactory;
 import org.example.wallet_service.repository.TransactionRepository;
 
@@ -17,12 +16,12 @@ public class TransactionService {
     }
 
     public Transaction transferData(TransactionDto transactionDto){
-        return transactionRepository.insert(transactionDto)
+        return transactionRepository.save(transactionDto)
                 .orElseThrow(() -> new TransferException("Ошибка операции"));
     }
 
     public List<Transaction> getTransactionHistoryByNumberAccount(Long accountNumber){
-        List<Transaction> transactions = transactionRepository.transactionHistoryByAccountNumber(accountNumber);
+        List<Transaction> transactions = transactionRepository.findTransactionsByAccountNumber(accountNumber);
         return transactions;
     }
 }

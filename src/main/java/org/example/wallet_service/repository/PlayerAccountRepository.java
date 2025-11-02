@@ -28,7 +28,7 @@ public class PlayerAccountRepository {
     public static final String UPDATE_BALANCE_BY_ACCOUNT_NUMBER = """
             UPDATE wallet_schema.player_account SET balance = ? WHERE account_number = ?;
             """;
-    public Optional<PlayerAccount> createAccount(CreatePlayerAccountDto createPlayerAccountDto){
+    public Optional<PlayerAccount> save(CreatePlayerAccountDto createPlayerAccountDto){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_ACCOUNT_INSERT_VALUES, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, createPlayerAccountDto.getPlayerId());
@@ -48,7 +48,7 @@ public class PlayerAccountRepository {
     }
 
 
-    public Optional<PlayerAccount> findAccountByNumber(Long accountNumber) {
+    public Optional<PlayerAccount> findAccountByNumber(long accountNumber) {
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_ACCOUNT_SELECT)) {
             preparedStatement.setObject(1, accountNumber);
@@ -70,7 +70,7 @@ public class PlayerAccountRepository {
 
     }
 
-    public Optional<PlayerAccount> findAccountByPlayerId (int playerId) {
+    public Optional<PlayerAccount> findAccountByPlayerId(int playerId) {
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_ACCOUNT_SELECT_BY_ID_PLAYER)) {
             preparedStatement.setObject(1, playerId );
@@ -91,7 +91,7 @@ public class PlayerAccountRepository {
         }
     }
 
-    public void updateBalanceByAccountNumber (BigDecimal balance, long accountNumber) {
+    public void updateBalanceByAccountNumber(BigDecimal balance, long accountNumber) {
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_BALANCE_BY_ACCOUNT_NUMBER)) {
             preparedStatement.setObject(1, balance);
@@ -101,5 +101,4 @@ public class PlayerAccountRepository {
             throw new RuntimeException(e);
         }
     }
-
 }

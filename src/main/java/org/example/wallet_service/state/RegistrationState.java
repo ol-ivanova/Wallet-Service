@@ -6,7 +6,6 @@ import org.example.wallet_service.domain.dto.PlayerAuditDto;
 import org.example.wallet_service.domain.entity.Player;
 import org.example.wallet_service.domain.entity.PlayerAccount;
 import org.example.wallet_service.domain.enums.AuditAction;
-import org.example.wallet_service.exceptions.PlayerAccountException;
 import org.example.wallet_service.factory.ConsoleFactory;
 import org.example.wallet_service.factory.PlayerAccountServiceFactory;
 import org.example.wallet_service.factory.PlayerAuditServiceFactory;
@@ -58,17 +57,10 @@ public class RegistrationState implements ConsoleState {
         try {
             Player player = playerService.createPlayer(createPlayerDto);
             System.out.println("Пользователь создан");
-            CreatePlayerAccountDto createPlayerAccountDto = CreatePlayerAccountDto.builder()
-                    .playerId(player.getId())
-                    .balance(BigDecimal.valueOf(0))
-                    .build();
-            PlayerAccount playerAccount = playerAccountService.createAccountPlayer(createPlayerAccountDto);
-            playerAccount.setPlayer(player);
-            PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
-                    .playerId(player.getId())
-                    .auditAction(AuditAction.LOGIN)
-                    .build();
-            playerAuditService.createLog(playerAuditDto);
+
+            createPlayerAccount(player);
+            createAuditLog(player);
+
             System.out.println("Добро пожаловать");
             nextState = new PlayerState(player.getId());
         } catch (RuntimeException e) {
@@ -83,6 +75,23 @@ public class RegistrationState implements ConsoleState {
                 default -> throw new IllegalStateException("Неправильное значение " + menuSelection);
             };
         }
+    }
+
+    private void createAuditLog(Player player) {
+        PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
+                .playerId(player.getId())
+                .auditAction(AuditAction.LOGIN)
+                .build();
+        playerAuditService.createLog(playerAuditDto);
+    }
+
+    private void createPlayerAccount(Player player) {
+        CreatePlayerAccountDto createPlayerAccountDto = CreatePlayerAccountDto.builder()
+                .playerId(player.getId())
+                .balance(BigDecimal.valueOf(0))
+                .build();
+        PlayerAccount playerAccount = playerAccountService.createAccountPlayer(createPlayerAccountDto);
+        playerAccount.setPlayer(player);
     }
 
     @Override

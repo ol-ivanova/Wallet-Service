@@ -7,6 +7,7 @@ import org.example.wallet_service.service.PlayerAuditService;
 import org.example.wallet_service.util.SelectionUtil;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -21,8 +22,8 @@ public class PlayerAuditState implements ConsoleState{
 
     public PlayerAuditState(Integer playerId){
         scanner = ConsoleFactory.getScanner();
-        this.playerId = playerId;
         playerAuditService = PlayerAuditServiceFactory.getPlayerAuditService();
+        this.playerId = playerId;
     }
 
 
@@ -30,12 +31,13 @@ public class PlayerAuditState implements ConsoleState{
     public void process() {
         System.out.println("История активности:");
         List<PlayerAudit> playerAuditList = playerAuditService.getLogsByPlayerId(playerId);
-        if(playerAuditList == null||playerAuditList.isEmpty()){
-            System.out.println("Активность не найдена");
-        }else{
-            for(PlayerAudit playerAudit : playerAuditList){
-                System.out.println(playerAudit.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")) + " | " + playerAudit.getAction());
+        if (playerAuditList != null && !playerAuditList.isEmpty()){
+            for (PlayerAudit playerAudit : playerAuditList){
+                System.out.println(playerAudit.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
+                        + " | " + playerAudit.getAction());
             }
+        } else {
+            System.out.println("Активность не найдена");
         }
 
         nextState = new PlayerState(playerId);

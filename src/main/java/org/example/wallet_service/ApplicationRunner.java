@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class ApplicationRunner {
     public static void main(String[] args) {
-        JDBCStarter.prepareDateBase();
+        JDBCStarter.initDateBase();
 
         ConsoleService consoleService = new ConsoleService();
         consoleService.execute();

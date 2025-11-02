@@ -8,7 +8,7 @@ public class TransactionRepositoryFactory {
     private TransactionRepositoryFactory(){}
 
     public static TransactionRepository getTransactionRepository(){
-        if(transactionRepository == null){
+        if (transactionRepository == null){
             transactionRepository = new TransactionRepository();
         }
         return transactionRepository;

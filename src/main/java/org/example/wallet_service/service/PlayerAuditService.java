@@ -15,7 +15,7 @@ public class PlayerAuditService {
     }
 
     public void createLog(PlayerAuditDto playerAuditDto){
-        playerAuditRepository.insertLog(playerAuditDto);
+        playerAuditRepository.save(playerAuditDto);
     }
 
     public List<PlayerAudit> getLogsByPlayerId(int playerId){

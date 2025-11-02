@@ -8,7 +8,7 @@ public class PlayerServiceFactory {
     private PlayerServiceFactory(){};
 
     public static PlayerService getPlayerService(){
-        if(playerService == null){
+        if (playerService == null){
             playerService = new PlayerService();
         }
         return playerService;

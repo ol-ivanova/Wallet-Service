@@ -8,7 +8,7 @@ public class PlayerAccountServiceFactory {
     private PlayerAccountServiceFactory(){}
 
     public static PlayerAccountService getPlayerAccountService(){
-        if(playerAccountService == null){
+        if (playerAccountService == null){
             playerAccountService = new PlayerAccountService();
         }
         return playerAccountService;

@@ -1,10 +1,8 @@
 package org.example.wallet_service.service;
 
 import org.example.wallet_service.domain.dto.CreatePlayerAccountDto;
-import org.example.wallet_service.domain.dto.CreatePlayerDto;
 import org.example.wallet_service.domain.entity.PlayerAccount;
-import org.example.wallet_service.exceptions.PlayerAccountException;
-import org.example.wallet_service.exceptions.PlayerException;
+import org.example.wallet_service.exception.PlayerAccountException;
 import org.example.wallet_service.factory.PlayerAccountRepositoryFactory;
 import org.example.wallet_service.repository.PlayerAccountRepository;
 
@@ -18,7 +16,7 @@ public class PlayerAccountService {
     }
 
     public PlayerAccount createAccountPlayer(CreatePlayerAccountDto createPlayerAccountDto){
-        return playerAccountRepository.createAccount(createPlayerAccountDto)
+        return playerAccountRepository.save(createPlayerAccountDto)
                 .orElseThrow(() -> new PlayerAccountException("Аккаунт не создан"));
     }
 
@@ -27,7 +25,7 @@ public class PlayerAccountService {
                 .orElseThrow(() -> new PlayerAccountException("Аккаунт не найден"));
     }
 
-    public PlayerAccount getAccountByPlayerID(int playerId){
+    public PlayerAccount getAccountByPlayerId(int playerId){
         return playerAccountRepository.findAccountByPlayerId(playerId)
                 .orElseThrow(() -> new PlayerAccountException("Аккаунт не найден"));
     }
@@ -35,6 +33,4 @@ public class PlayerAccountService {
     public void updateBalanceByAccountNumber(BigDecimal balance, long accountNumber){
         playerAccountRepository.updateBalanceByAccountNumber(balance, accountNumber);
     }
-
-
 }

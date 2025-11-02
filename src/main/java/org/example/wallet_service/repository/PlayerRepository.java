@@ -19,7 +19,7 @@ public class PlayerRepository {
     public static final String PLAYER_SELECT_BY_ID = """
             SELECT * FROM wallet_schema.player WHERE id = ?;
             """;
-    public Optional<Player> create(CreatePlayerDto createPlayerDto){
+    public Optional<Player> save(CreatePlayerDto createPlayerDto){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_INSERT_VALUES,Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, createPlayerDto.getName());
@@ -42,7 +42,7 @@ public class PlayerRepository {
         }
     }
 
-    public Optional<Player> find(AuthorizationDto authorizationDto){
+    public Optional<Player> findByUsernameAndPassword(AuthorizationDto authorizationDto){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_SELECT)) {
             preparedStatement.setObject(1, authorizationDto.getUsername());

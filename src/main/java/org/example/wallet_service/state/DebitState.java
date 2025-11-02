@@ -3,12 +3,11 @@ package org.example.wallet_service.state;
 import org.example.wallet_service.domain.dto.TransactionDto;
 import org.example.wallet_service.domain.entity.PlayerAccount;
 import org.example.wallet_service.domain.enums.TransactionType;
-import org.example.wallet_service.exceptions.PlayerAccountException;
+import org.example.wallet_service.exception.PlayerAccountException;
 import org.example.wallet_service.factory.ConsoleFactory;
 import org.example.wallet_service.factory.PlayerAccountServiceFactory;
 import org.example.wallet_service.factory.TransactionServiceFactory;
 import org.example.wallet_service.service.PlayerAccountService;
-import org.example.wallet_service.service.PlayerService;
 import org.example.wallet_service.service.TransactionService;
 import org.example.wallet_service.util.SelectionUtil;
 
@@ -29,9 +28,9 @@ public class DebitState implements ConsoleState{
 
     public DebitState(PlayerAccount playerAccount){
         scanner = ConsoleFactory.getScanner();
-        this.playerAccount = playerAccount;
         playerAccountService = PlayerAccountServiceFactory.getPlayerAccountService();
         transactionService = TransactionServiceFactory.getTransactionService();
+        this.playerAccount = playerAccount;
     }
 
     @Override
@@ -51,14 +50,7 @@ public class DebitState implements ConsoleState{
             playerAccountService.updateBalanceByAccountNumber(playerAccount.getBalance(), accountNumber);
             playerAccountService.updateBalanceByAccountNumber(this.playerAccount.getBalance(), this.playerAccount.getAccountNumber());
 
-            TransactionDto transactionDto = TransactionDto.builder()
-                    .type(TransactionType.DEBIT)
-                    .sum(sum)
-                    .playerAccountFrom(playerAccount.getAccountNumber())
-                    .playerAccountTo(this.playerAccount.getAccountNumber())
-                    .build();
-
-            transactionService.transferData(transactionDto);
+            createTransaction(sum , playerAccount);
             nextState = new PlayerAccountState(this.playerAccount.getAccountNumber());
         } catch (PlayerAccountException e) {
             System.out.println(e.getMessage());
@@ -71,9 +63,20 @@ public class DebitState implements ConsoleState{
                 case 2 -> new PlayerAccountState(this.playerAccount.getAccountNumber());
                 default -> throw new IllegalStateException("Неправильно значение" + menuSelection);
             };
-
         }
     }
+
+    private void createTransaction(BigDecimal sum , PlayerAccount playerAccount) {
+        TransactionDto transactionDto = TransactionDto.builder()
+                .type(TransactionType.DEBIT)
+                .sum(sum)
+                .playerAccountFrom(playerAccount.getAccountNumber())
+                .playerAccountTo(this.playerAccount.getAccountNumber())
+                .build();
+
+        transactionService.transferData(transactionDto);
+    }
+
     @Override
     public ConsoleState nextState () {
         return nextState;

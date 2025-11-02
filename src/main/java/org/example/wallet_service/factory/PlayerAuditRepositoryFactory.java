@@ -8,7 +8,7 @@ public class PlayerAuditRepositoryFactory {
     private PlayerAuditRepositoryFactory(){};
 
     public static PlayerAuditRepository getplayerAuditRepository(){
-        if(playerAuditRepository == null){
+        if (playerAuditRepository == null){
             playerAuditRepository = new PlayerAuditRepository();
         }
         return playerAuditRepository;

@@ -8,7 +8,7 @@ public class TransactionServiceFactory {
     private TransactionServiceFactory(){}
 
     public static TransactionService getTransactionService(){
-        if(transactionService == null){
+        if (transactionService == null){
             transactionService = new TransactionService();
         }
         return transactionService;

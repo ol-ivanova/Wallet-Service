@@ -8,7 +8,7 @@ public class PlayerAuditServiceFactory {
     private PlayerAuditServiceFactory(){};
 
     public static PlayerAuditService getPlayerAuditService(){
-        if(playerAuditService == null){
+        if (playerAuditService == null){
             playerAuditService = new PlayerAuditService();
         }
         return playerAuditService;

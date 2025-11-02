@@ -4,7 +4,6 @@ import org.example.wallet_service.domain.dto.AuthorizationDto;
 import org.example.wallet_service.domain.dto.PlayerAuditDto;
 import org.example.wallet_service.domain.entity.Player;
 import org.example.wallet_service.domain.enums.AuditAction;
-import org.example.wallet_service.exceptions.PlayerAccountException;
 import org.example.wallet_service.factory.ConsoleFactory;
 import org.example.wallet_service.factory.PlayerAuditServiceFactory;
 import org.example.wallet_service.factory.PlayerServiceFactory;
@@ -37,18 +36,15 @@ public class AuthorizationState implements ConsoleState {
         System.out.println("Введите пароль");
         String password = SelectionUtil.getValue(() -> scanner.nextLine());
 
-        AuthorizationDto authorizationDto = AuthorizationDto.builder()
-                .username(username)
-                .password(password)
-                .build();
-
         try{
-            Player player = playerService.findByCreds(authorizationDto);
-            PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
-                    .playerId(player.getId())
-                    .auditAction(AuditAction.LOGIN)
+            AuthorizationDto authorizationDto = AuthorizationDto.builder()
+                    .username(username)
+                    .password(password)
                     .build();
-            playerAuditService.createLog(playerAuditDto);
+            Player player = playerService.findByCreds(authorizationDto);
+
+            createAuditLog(player);
+
             System.out.println("Добро пожаловать");
             nextState = new PlayerState(player.getId());
         }catch (RuntimeException e){
@@ -62,6 +58,14 @@ public class AuthorizationState implements ConsoleState {
                 default -> throw new IllegalStateException("Неправильное значение " + menuSelection);
             };
         }
+    }
+
+    private void createAuditLog(Player player) {
+        PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
+                .playerId(player.getId())
+                .auditAction(AuditAction.LOGIN)
+                .build();
+        playerAuditService.createLog(playerAuditDto);
     }
 
     @Override

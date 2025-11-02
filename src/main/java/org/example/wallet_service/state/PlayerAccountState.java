@@ -20,8 +20,8 @@ public class PlayerAccountState implements ConsoleState{
 
     public PlayerAccountState(Long accountNumber){
         scanner = ConsoleFactory.getScanner();
-        this.accountNumber = accountNumber;
         playerAccountService = PlayerAccountServiceFactory.getPlayerAccountService();
+        this.accountNumber = accountNumber;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class PlayerAccountState implements ConsoleState{
             case 2 -> new CreditState(playerAccount);
             case 3 -> new DebitState(playerAccount);
             case 4 -> new PlayerState(playerAccount.getPlayer().getId());
-            default -> throw new IllegalStateException("Неправильное значение: " + menuSelection);
+            default -> throw new IllegalStateException("Некорректное значение: " + menuSelection);
         };
     }
 

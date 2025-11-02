@@ -30,7 +30,7 @@ public class TransactionRepository {
             SELECT * FROM wallet_schema.transaction WHERE player_account_from = ? OR player_account_to = ?;
             """;
 
-    public Optional<Transaction> insert(TransactionDto transactionDto){
+    public Optional<Transaction> save(TransactionDto transactionDto){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(TRANSACTION_INSERT_VALUES, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setObject(1, transactionDto.getType().name());
@@ -51,7 +51,7 @@ public class TransactionRepository {
         }
     }
 
-    public List<Transaction> transactionHistoryByAccountNumber(Long numberAccount){
+    public List<Transaction> findTransactionsByAccountNumber(Long numberAccount){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(TRANSACTION_SELECT_BY_ACCOUNT_NUMBER)){
             preparedStatement.setObject(1, numberAccount);

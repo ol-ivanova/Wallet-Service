@@ -20,7 +20,7 @@ public class PlayerAuditRepository {
             SELECT * FROM wallet_schema.player_audit WHERE player_id = ?;
             """;
 
-    public void insertLog (PlayerAuditDto playerAuditDto) {
+    public void save(PlayerAuditDto playerAuditDto) {
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(CREATE_LOG)) {
             preparedStatement.setObject(1, playerAuditDto.getAuditAction().name());
@@ -31,7 +31,7 @@ public class PlayerAuditRepository {
         }
     }
 
-    public List<PlayerAudit> findLogsByPlayerId (int playerId) {
+    public List<PlayerAudit> findLogsByPlayerId(int playerId) {
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_LOG_BY_PLAYER_ID)) {
             preparedStatement.setObject(1, playerId);
@@ -52,5 +52,4 @@ public class PlayerAuditRepository {
             throw new RuntimeException(e);
         }
     }
-
 }
