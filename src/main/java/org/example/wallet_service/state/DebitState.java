@@ -59,26 +59,17 @@ public class DebitState implements ConsoleState{
     @Override
     public void process() {
         System.out.println("Укажите номер, с которого будет пополнение");
-        Long accountNumber = SelectionUtil.getValue(() -> scanner.nextLong());
+        Long accountNumberFrom = SelectionUtil.getValue(() -> scanner.nextLong());
 
         System.out.println("Укажите сумму пополнения");
         BigDecimal sum = SelectionUtil.getValue(() -> scanner.nextBigDecimal());
 
         try {
-            PlayerAccount playerAccount = playerAccountService.getAccountByNumber(accountNumber);
-            if (sum.compareTo(playerAccount.getBalance()) >= 0) {
-                throw new TransferException("Сумма не может превышать баланс");
-            }
-                playerAccount.setBalance(playerAccount.getBalance().subtract(sum));
+            playerAccountService.doDebitOperation(sum, accountNumberFrom, playerAccount);
 
-                this.playerAccount.setBalance(this.playerAccount.getBalance().add(sum));
+            createTransaction(sum, playerAccount);
 
-                playerAccountService.updateBalanceByAccountNumber(playerAccount.getBalance(), accountNumber);
-                playerAccountService.updateBalanceByAccountNumber(this.playerAccount.getBalance(), this.playerAccount.getAccountNumber());
-
-                createTransaction(sum, playerAccount);
-                nextState = new PlayerAccountState(this.playerAccount.getAccountNumber());
-
+            nextState = new PlayerAccountState(this.playerAccount.getAccountNumber());
         } catch (TransferException e) {
             System.out.println(e.getMessage());
             System.out.println("1. Попробовать снова\n 2. Вернуться назад\n Выберите необходимый вариант");

@@ -1,9 +1,11 @@
 package org.example.wallet_service.service;
 
 import org.example.wallet_service.domain.dto.CreatePlayerAccountDto;
+import org.example.wallet_service.domain.entity.Player;
 import org.example.wallet_service.domain.entity.PlayerAccount;
 import org.example.wallet_service.domain.mapper.PlayerAccountMapper;
 import org.example.wallet_service.exception.PlayerAccountException;
+import org.example.wallet_service.exception.TransferException;
 import org.example.wallet_service.factory.PlayerAccountRepositoryFactory;
 import org.example.wallet_service.repository.PlayerAccountRepository;
 
@@ -51,12 +53,31 @@ public class PlayerAccountService {
                 .orElseThrow(() -> new PlayerAccountException("Аккаунт не найден"));
     }
 
-    /**
-     * Метод для изменения баланса по номеру счета
-     * @param balance - баланс пользователя
-     * @param accountNumber - номер счета пользователя
-     */
-    public void updateBalanceByAccountNumber(BigDecimal balance, long accountNumber){
-        playerAccountRepository.updateBalanceByAccountNumber(balance, accountNumber);
+    public void doCreditOperation(BigDecimal sum, long accountNumberTo, PlayerAccount currentPlayerAccount){
+        PlayerAccount playerAccount = getAccountByNumber(accountNumberTo);
+        if (sum.compareTo(currentPlayerAccount.getBalance()) >= 0) {
+            throw new TransferException("Сумма не может превышать баланс");
+        }
+
+        playerAccount.setBalance(playerAccount.getBalance().add(sum));
+
+        currentPlayerAccount.setBalance(currentPlayerAccount.getBalance().subtract(sum));
+
+        playerAccountRepository.updateBalanceByAccountNumber(playerAccount.getBalance() , accountNumberTo);
+        playerAccountRepository.updateBalanceByAccountNumber(currentPlayerAccount.getBalance() , currentPlayerAccount.getAccountNumber());
+    }
+
+    public void doDebitOperation(BigDecimal sum, long accountNumberFrom, PlayerAccount currentPlayerAccount){
+        PlayerAccount playerAccount = getAccountByNumber(accountNumberFrom);
+        if (sum.compareTo(playerAccount.getBalance()) >= 0) {
+            throw new TransferException("Сумма не может превышать баланс");
+        }
+
+        playerAccount.setBalance(playerAccount.getBalance().subtract(sum));
+
+        currentPlayerAccount.setBalance(currentPlayerAccount.getBalance().add(sum));
+
+        playerAccountRepository.updateBalanceByAccountNumber(playerAccount.getBalance(), accountNumberFrom);
+        playerAccountRepository.updateBalanceByAccountNumber(currentPlayerAccount.getBalance(), currentPlayerAccount.getAccountNumber());
     }
 }

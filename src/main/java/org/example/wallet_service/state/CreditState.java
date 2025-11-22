@@ -57,21 +57,16 @@ public class CreditState implements ConsoleState {
     @Override
     public void process() {
         System.out.println("Укажите номер получателя");
-        Long accountNumber = SelectionUtil.getValue(() -> scanner.nextLong());
+        Long accountNumberTo = SelectionUtil.getValue(() -> scanner.nextLong());
 
         System.out.println("Укажите сумму перевода");
         BigDecimal sum = SelectionUtil.getValue(() -> scanner.nextBigDecimal());
 
         try {
-            PlayerAccount playerAccount = playerAccountService.getAccountByNumber(accountNumber);
-            playerAccount.setBalance(playerAccount.getBalance().add(sum));
-
-            this.playerAccount.setBalance(this.playerAccount.getBalance().subtract(sum));
-
-            playerAccountService.updateBalanceByAccountNumber(playerAccount.getBalance() , accountNumber);
-            playerAccountService.updateBalanceByAccountNumber(this.playerAccount.getBalance() , this.playerAccount.getAccountNumber());
+            playerAccountService.doCreditOperation(sum, accountNumberTo, playerAccount);
 
             createTransaction(sum , playerAccount);
+
             nextState = new PlayerAccountState(this.playerAccount.getAccountNumber());
         } catch (PlayerAccountException e) {
             System.out.println(e.getMessage());
