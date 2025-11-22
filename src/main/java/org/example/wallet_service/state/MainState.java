@@ -6,10 +6,12 @@ import org.example.wallet_service.util.SelectionUtil;
 import java.util.Scanner;
 
 public class MainState implements ConsoleState{
-    /** Объект сканнера
+    /**
+     * Объект сканнера
      */
     private final Scanner scanner;
-    /** следующее состояние приложения
+    /**
+     * Следующее состояние приложения
      */
     private ConsoleState nextState;
 
@@ -17,7 +19,8 @@ public class MainState implements ConsoleState{
         scanner = ConsoleFactory.getScanner();
     }
 
-    /** метод, запускающий логику начального состояния приложения
+    /**
+     * Метод, запускающий логику начального состояния приложения
      * @throws Exception
      */
     @Override
@@ -33,8 +36,9 @@ public class MainState implements ConsoleState{
         }
     }
 
-    /** метод, возвращающий слудующее состояние приложения
-     * @return - слудующее состояние приложения
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
      */
     @Override
     public ConsoleState nextState() {

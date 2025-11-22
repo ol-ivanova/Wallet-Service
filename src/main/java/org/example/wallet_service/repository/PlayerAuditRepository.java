@@ -1,7 +1,5 @@
 package org.example.wallet_service.repository;
 
-import org.example.wallet_service.domain.dto.PlayerAuditDto;
-import org.example.wallet_service.domain.entity.Player;
 import org.example.wallet_service.domain.entity.PlayerAudit;
 import org.example.wallet_service.domain.enums.AuditAction;
 import org.example.wallet_service.util.ConnectionManager;
@@ -20,17 +18,26 @@ public class PlayerAuditRepository {
             SELECT * FROM wallet_schema.player_audit WHERE player_id = ?;
             """;
 
-    public void save(PlayerAuditDto playerAuditDto) {
+    /**
+     * Метод для сохранения логов в БД
+     * @param playerAudit - объект playerAudit
+     */
+    public void save(PlayerAudit playerAudit) {
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(CREATE_LOG)) {
-            preparedStatement.setObject(1, playerAuditDto.getAuditAction().name());
-            preparedStatement.setObject(2, playerAuditDto.getPlayerId());
+            preparedStatement.setObject(1, playerAudit.getAction().name());
+            preparedStatement.setObject(2, playerAudit.getPlayerId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Метод для получения логов из Бд по id пользователя
+     * @param playerId - id пользователя
+     * @return - список логов
+     */
     public List<PlayerAudit> findLogsByPlayerId(int playerId) {
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_LOG_BY_PLAYER_ID)) {

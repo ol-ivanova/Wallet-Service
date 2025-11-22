@@ -5,6 +5,10 @@ import lombok.Data;
 
 @Data
 @Builder
+
+/**
+ * dto объект для регистрации
+ */
 public class CreatePlayerDto {
     private String name;
     private String username;

@@ -12,15 +12,34 @@ import org.example.wallet_service.util.SelectionUtil;
 
 import java.util.Scanner;
 
+/**
+ * Состояние - меню пользователя
+ */
 public class PlayerState implements ConsoleState{
+
+    /**
+     * Объект сканнера
+     */
     private final Scanner scanner;
 
+    /**
+     * Следующее состояние приложения
+     */
     private ConsoleState nextState;
 
+    /**
+     * id пользователя
+     */
     private Integer playerId;
 
+    /**
+     * Сервис для работы со счетом пользователя
+     */
     private PlayerAccountService playerAccountService;
 
+    /**
+     * Сервис для работы с логами пользователя
+     */
     private PlayerAuditService playerAuditService;
 
     public PlayerState(Integer playerId){
@@ -29,6 +48,10 @@ public class PlayerState implements ConsoleState{
         playerAuditService = PlayerAuditServiceFactory.getPlayerAuditService();
         this.playerId = playerId;
     }
+
+    /**
+     * Метод, запускающий логику процесса работы с меню
+     */
     @Override
     public void process() {
         PlayerAccount playerAccount = playerAccountService.getAccountByPlayerId(playerId);
@@ -47,6 +70,9 @@ public class PlayerState implements ConsoleState{
         };
     }
 
+    /**
+     * Метод для фиксирования выхода пользователя
+     */
     private void createAuditLog() {
         PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
                 .playerId(playerId)
@@ -55,6 +81,10 @@ public class PlayerState implements ConsoleState{
         playerAuditService.createLog(playerAuditDto);
     }
 
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
+     */
     @Override
     public ConsoleState nextState() {
         return nextState;

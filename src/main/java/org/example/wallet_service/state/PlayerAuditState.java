@@ -11,22 +11,34 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Состояние - логи пользователя
+ */
 public class PlayerAuditState implements ConsoleState{
-    private final Scanner scanner;
 
+    /**
+     * Следующее состояние приложения
+     */
     private ConsoleState nextState;
 
+    /**
+     * id пользователя
+     */
     private Integer playerId;
 
+    /**
+     * Сервис для работы с логами пользователя
+     */
     private PlayerAuditService playerAuditService;
 
     public PlayerAuditState(Integer playerId){
-        scanner = ConsoleFactory.getScanner();
         playerAuditService = PlayerAuditServiceFactory.getPlayerAuditService();
         this.playerId = playerId;
     }
 
-
+    /**
+     * Метод, запускающий логику процесса отображения логов пользователя
+     */
     @Override
     public void process() {
         System.out.println("История активности:");
@@ -43,6 +55,10 @@ public class PlayerAuditState implements ConsoleState{
         nextState = new PlayerState(playerId);
     }
 
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
+     */
     @Override
     public ConsoleState nextState() {
         return nextState;

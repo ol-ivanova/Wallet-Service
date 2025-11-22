@@ -7,6 +7,10 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
+
+/**
+ * dto объект для создания счета
+ */
 public class CreatePlayerAccountDto {
     private BigDecimal balance;
     private int playerId;

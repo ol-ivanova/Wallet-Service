@@ -2,6 +2,9 @@ package org.example.wallet_service.factory;
 
 import org.example.wallet_service.repository.PlayerAuditRepository;
 
+/**
+ * Данный класс отвечает за создание единственного экземпляра класса PlayerAuditRepository
+ */
 public class PlayerAuditRepositoryFactory {
     private static PlayerAuditRepository playerAuditRepository;
 

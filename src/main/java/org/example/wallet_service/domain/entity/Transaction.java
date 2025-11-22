@@ -19,11 +19,33 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Builder
+
+/**
+ * Сущность - транзакции
+ */
 public class Transaction {
+    /**
+     * id, генерируемый при вставке экземпляра класса в БД
+     */
     private UUID id;
+    /**
+     * Время транзакции, генерируемое при вставке экземпляра класса в БД
+     */
     private LocalDateTime createdDate;
+    /**
+     * Тип транзакции
+     */
     private TransactionType type;
+    /**
+     * Сумма транзакции
+     */
     private BigDecimal sum;
-    private PlayerAccount playerAccountFrom;
-    private PlayerAccount playerAccountTo;
+    /**
+     * Счет отправителя
+     */
+    private long playerAccountFrom;
+    /**
+     * Счет получателя
+     */
+    private long playerAccountTo;
 }

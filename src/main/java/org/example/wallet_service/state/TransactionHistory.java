@@ -13,21 +13,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * Состояние - истории транзакций
+ */
 public class TransactionHistory implements ConsoleState{
-    private final Scanner scanner;
 
+    /**
+     * Следующее состояние приложения
+     */
     private ConsoleState nextState;
 
+    /**
+     * Номер счета
+     */
     private Long accountNumber;
 
+    /**
+     * Сервис для работы с транзакциями пользователя
+     */
     private TransactionService transactionService;
 
     public TransactionHistory(Long accountNumber){
-        scanner = ConsoleFactory.getScanner();
         transactionService = TransactionServiceFactory.getTransactionService();
         this.accountNumber = accountNumber;
     }
 
+    /**
+     * Метод, запускающий логику процесса истории транзакций
+     */
     @Override
     public void process() {
         System.out.println("История операций: ");
@@ -46,12 +59,15 @@ public class TransactionHistory implements ConsoleState{
         nextState = new PlayerAccountState(accountNumber);
     }
 
+    /**
+     * Метод, запускающий логику процесса отображения транзакций
+     */
     private Map<TransactionType, List<String>> getMessages(List<Transaction> transactions) {
         Map<TransactionType, List<String>> transactionsByType = new HashMap<>();
-        StringBuilder sb = new StringBuilder();
         for (Transaction transaction : transactions){
             if (transaction.getType() == TransactionType.CREDIT){
-                sb.append("To: " + transaction.getPlayerAccountTo().getPlayer().getName())
+                StringBuilder sb = new StringBuilder();
+                sb.append("To: " + transaction.getPlayerAccountTo())
                         .append(" | type: " + transaction.getType())
                         .append(" | date: " + transaction.getCreatedDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
                         .append(" | sum: " + transaction.getSum());
@@ -61,7 +77,8 @@ public class TransactionHistory implements ConsoleState{
                 }
                 transactionsByType.get(TransactionType.CREDIT).add(sb.toString());
             } else {
-                sb.append("From: " + transaction.getPlayerAccountFrom().getPlayer().getName())
+                StringBuilder sb = new StringBuilder();
+                sb.append("From: " + transaction.getPlayerAccountFrom())
                         .append(" | type: " + transaction.getType())
                         .append(" | date: " + transaction.getCreatedDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
                         .append(" | sum: " + transaction.getSum());
@@ -76,6 +93,10 @@ public class TransactionHistory implements ConsoleState{
         return transactionsByType;
     }
 
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
+     */
     @Override
     public ConsoleState nextState() {
         return nextState;

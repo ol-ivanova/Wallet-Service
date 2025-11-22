@@ -4,7 +4,6 @@ import org.example.wallet_service.domain.dto.CreatePlayerAccountDto;
 import org.example.wallet_service.domain.dto.CreatePlayerDto;
 import org.example.wallet_service.domain.dto.PlayerAuditDto;
 import org.example.wallet_service.domain.entity.Player;
-import org.example.wallet_service.domain.entity.PlayerAccount;
 import org.example.wallet_service.domain.enums.AuditAction;
 import org.example.wallet_service.factory.ConsoleFactory;
 import org.example.wallet_service.factory.PlayerAccountServiceFactory;
@@ -18,16 +17,34 @@ import org.example.wallet_service.util.SelectionUtil;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
+/**
+ * Состояние - регистрация пользователя
+ */
 public class RegistrationState implements ConsoleState {
 
+    /**
+     * Объект сканнера
+     */
     private final Scanner scanner;
 
+    /**
+     * Следующее состояние приложения
+     */
     private ConsoleState nextState;
 
+    /**
+     * Сервис для работы со счетом пользователя
+     */
     private PlayerAccountService playerAccountService;
 
+    /**
+     * Сервис для работы с пользователем
+     */
     private PlayerService playerService;
 
+    /**
+     * Сервис для работы с логами пользователя
+     */
     private PlayerAuditService playerAuditService;
 
     public RegistrationState(){
@@ -37,7 +54,9 @@ public class RegistrationState implements ConsoleState {
         playerAuditService = PlayerAuditServiceFactory.getPlayerAuditService();
     }
 
-
+    /**
+     * Метод, запускающий логику процесса регистрации пользователя
+     */
     @Override
     public void process() {
         System.out.println("Введите имя");
@@ -77,6 +96,10 @@ public class RegistrationState implements ConsoleState {
         }
     }
 
+    /**
+     * Метод для фиксирования входа пользователя
+     * @param player - объект Player
+     */
     private void createAuditLog(Player player) {
         PlayerAuditDto playerAuditDto = PlayerAuditDto.builder()
                 .playerId(player.getId())
@@ -85,15 +108,22 @@ public class RegistrationState implements ConsoleState {
         playerAuditService.createLog(playerAuditDto);
     }
 
+    /**
+     * Метод для создания счета пользователя
+     * @param player - объект Player
+     */
     private void createPlayerAccount(Player player) {
         CreatePlayerAccountDto createPlayerAccountDto = CreatePlayerAccountDto.builder()
                 .playerId(player.getId())
                 .balance(BigDecimal.valueOf(0))
                 .build();
-        PlayerAccount playerAccount = playerAccountService.createAccountPlayer(createPlayerAccountDto);
-        playerAccount.setPlayer(player);
+        playerAccountService.createAccountPlayer(createPlayerAccountDto);
     }
 
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
+     */
     @Override
     public ConsoleState nextState() {
         return nextState;

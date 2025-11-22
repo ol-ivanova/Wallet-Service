@@ -4,6 +4,8 @@ import org.example.wallet_service.domain.dto.TransactionDto;
 import org.example.wallet_service.domain.entity.PlayerAccount;
 import org.example.wallet_service.domain.enums.TransactionType;
 import org.example.wallet_service.exception.PlayerAccountException;
+import org.example.wallet_service.exception.PlayerException;
+import org.example.wallet_service.exception.TransferException;
 import org.example.wallet_service.factory.ConsoleFactory;
 import org.example.wallet_service.factory.PlayerAccountServiceFactory;
 import org.example.wallet_service.factory.TransactionServiceFactory;
@@ -14,16 +16,34 @@ import org.example.wallet_service.util.SelectionUtil;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
+/**
+ * Состояние - дебит операции
+ */
 public class DebitState implements ConsoleState{
+
+    /**
+     * Объект сканнера
+     */
     private final Scanner scanner;
-    /** следующее состояние приложения
+
+    /**
+     * Следующее состояние приложения
      */
     private ConsoleState nextState;
 
+    /**
+     * Объект класса PlayerAccount
+     */
     private PlayerAccount playerAccount;
 
+    /**
+     * Сервис для работы со счетом пользователя
+     */
     private PlayerAccountService playerAccountService;
 
+    /**
+     * Сервис для работы с транзакциями пользователя
+     */
     private TransactionService transactionService;
 
     public DebitState(PlayerAccount playerAccount){
@@ -33,6 +53,9 @@ public class DebitState implements ConsoleState{
         this.playerAccount = playerAccount;
     }
 
+    /**
+     * Метод, запускающий логику процесса debit операций
+     */
     @Override
     public void process() {
         System.out.println("Укажите номер, с которого будет пополнение");
@@ -43,16 +66,20 @@ public class DebitState implements ConsoleState{
 
         try {
             PlayerAccount playerAccount = playerAccountService.getAccountByNumber(accountNumber);
-            playerAccount.setBalance(playerAccount.getBalance().subtract(sum));
+            if (sum.compareTo(playerAccount.getBalance()) >= 0) {
+                throw new TransferException("Сумма не может превышать баланс");
+            }
+                playerAccount.setBalance(playerAccount.getBalance().subtract(sum));
 
-            this.playerAccount.setBalance(this.playerAccount.getBalance().add(sum));
+                this.playerAccount.setBalance(this.playerAccount.getBalance().add(sum));
 
-            playerAccountService.updateBalanceByAccountNumber(playerAccount.getBalance(), accountNumber);
-            playerAccountService.updateBalanceByAccountNumber(this.playerAccount.getBalance(), this.playerAccount.getAccountNumber());
+                playerAccountService.updateBalanceByAccountNumber(playerAccount.getBalance(), accountNumber);
+                playerAccountService.updateBalanceByAccountNumber(this.playerAccount.getBalance(), this.playerAccount.getAccountNumber());
 
-            createTransaction(sum , playerAccount);
-            nextState = new PlayerAccountState(this.playerAccount.getAccountNumber());
-        } catch (PlayerAccountException e) {
+                createTransaction(sum, playerAccount);
+                nextState = new PlayerAccountState(this.playerAccount.getAccountNumber());
+
+        } catch (TransferException e) {
             System.out.println(e.getMessage());
             System.out.println("1. Попробовать снова\n 2. Вернуться назад\n Выберите необходимый вариант");
 
@@ -64,8 +91,14 @@ public class DebitState implements ConsoleState{
                 default -> throw new IllegalStateException("Неправильно значение" + menuSelection);
             };
         }
+
     }
 
+    /**
+     * Метод для фиксирования транзакции
+     * @param sum - сумма перевода
+     * @param playerAccount - аккаунт отправителя
+     */
     private void createTransaction(BigDecimal sum , PlayerAccount playerAccount) {
         TransactionDto transactionDto = TransactionDto.builder()
                 .type(TransactionType.DEBIT)
@@ -77,6 +110,10 @@ public class DebitState implements ConsoleState{
         transactionService.transferData(transactionDto);
     }
 
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
+     */
     @Override
     public ConsoleState nextState () {
         return nextState;

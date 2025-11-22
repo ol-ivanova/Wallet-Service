@@ -8,13 +8,29 @@ import org.example.wallet_service.util.SelectionUtil;
 
 import java.util.Scanner;
 
+/**
+ * Состояние - счет пользователя
+ */
 public class PlayerAccountState implements ConsoleState{
+
+    /**
+     * Объект сканнера
+     */
     private final Scanner scanner;
 
+    /**
+     * Следующее состояние приложения
+     */
     private ConsoleState nextState;
 
+    /**
+     * Номер счета
+     */
     private Long accountNumber;
 
+    /**
+     * Сервис для работы со счетом пользователя
+     */
     private PlayerAccountService playerAccountService;
 
 
@@ -24,6 +40,9 @@ public class PlayerAccountState implements ConsoleState{
         this.accountNumber = accountNumber;
     }
 
+    /**
+     * Метод, запускающий логику процесса работы со счетом
+     */
     @Override
     public void process() {
         PlayerAccount playerAccount = playerAccountService.getAccountByNumber(accountNumber);
@@ -37,11 +56,15 @@ public class PlayerAccountState implements ConsoleState{
             case 1 -> new TransactionHistory(playerAccount.getAccountNumber());
             case 2 -> new CreditState(playerAccount);
             case 3 -> new DebitState(playerAccount);
-            case 4 -> new PlayerState(playerAccount.getPlayer().getId());
+            case 4 -> new PlayerState(playerAccount.getPlayerId());
             default -> throw new IllegalStateException("Некорректное значение: " + menuSelection);
         };
     }
 
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
+     */
     @Override
     public ConsoleState nextState() {
         return nextState;

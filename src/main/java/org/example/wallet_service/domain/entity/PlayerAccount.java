@@ -11,8 +11,21 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Data
 @Builder
+
+/**
+ * Сущность - счет пользователя
+ */
 public class PlayerAccount {
+    /**
+     * Номер счета, генерируемый при вставке экземпляра класса в БД
+     */
     private Long accountNumber;
+    /**
+     * Баланс счета
+     */
     private BigDecimal balance;
-    private Player player;
+    /**
+     * id пользователя, к которому привязан счет
+     */
+    private int playerId;
 }

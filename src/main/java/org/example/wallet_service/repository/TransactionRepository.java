@@ -30,20 +30,22 @@ public class TransactionRepository {
             SELECT * FROM wallet_schema.transaction WHERE player_account_from = ? OR player_account_to = ?;
             """;
 
-    public Optional<Transaction> save(TransactionDto transactionDto){
+    /**
+     * Метод, вставляющий объект Transaction в БД
+     * @param transaction - объект Transaction
+     * @return - объект Transaction со сгенерированным id
+     */
+    public Optional<Transaction> save(Transaction transaction){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(TRANSACTION_INSERT_VALUES, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setObject(1, transactionDto.getType().name());
-            preparedStatement.setObject(2, transactionDto.getSum());
-            preparedStatement.setObject(3, transactionDto.getPlayerAccountFrom());
-            preparedStatement.setObject(4, transactionDto.getPlayerAccountTo());
+            preparedStatement.setObject(1, transaction.getType().name());
+            preparedStatement.setObject(2, transaction.getSum());
+            preparedStatement.setObject(3, transaction.getPlayerAccountFrom());
+            preparedStatement.setObject(4, transaction.getPlayerAccountTo());
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            Transaction transaction = null;
             if(generatedKeys.next()){
-                transaction = Transaction.builder()
-                        .id(generatedKeys.getObject("id", UUID.class))
-                        .build();
+                transaction.setId(generatedKeys.getObject("id", UUID.class));
             }
             return Optional.ofNullable(transaction);
         } catch (SQLException e) {
@@ -51,6 +53,11 @@ public class TransactionRepository {
         }
     }
 
+    /**
+     * Метод, запрашивающий информацию о транзакциях с БД по номеру счета
+     * @param numberAccount - номер счета
+     * @return - список транзакций
+     */
     public List<Transaction> findTransactionsByAccountNumber(Long numberAccount){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(TRANSACTION_SELECT_BY_ACCOUNT_NUMBER)){
@@ -64,12 +71,8 @@ public class TransactionRepository {
                         .createdDate(resultSet.getObject("created_date", LocalDateTime.class))
                         .type(TransactionType.valueOf(resultSet.getString("type")))
                         .sum(resultSet.getObject("sum", BigDecimal.class))
-                        .playerAccountFrom(playerAccountRepository.findAccountByNumber(
-                                resultSet.getObject("player_account_from", Long.class))
-                                .orElse(null))
-                        .playerAccountTo(playerAccountRepository.findAccountByNumber(
-                                resultSet.getObject("player_account_to", Long.class))
-                                .orElse(null))
+                        .playerAccountFrom(resultSet.getObject("player_account_from", Long.class))
+                        .playerAccountTo(resultSet.getObject("player_account_to", Long.class))
                         .build();
 
                 transactionList.add(transaction);

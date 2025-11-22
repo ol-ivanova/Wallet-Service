@@ -2,6 +2,7 @@ package org.example.wallet_service.service;
 
 import org.example.wallet_service.domain.dto.CreatePlayerAccountDto;
 import org.example.wallet_service.domain.entity.PlayerAccount;
+import org.example.wallet_service.domain.mapper.PlayerAccountMapper;
 import org.example.wallet_service.exception.PlayerAccountException;
 import org.example.wallet_service.factory.PlayerAccountRepositoryFactory;
 import org.example.wallet_service.repository.PlayerAccountRepository;
@@ -11,25 +12,50 @@ import java.math.BigDecimal;
 public class PlayerAccountService {
     private PlayerAccountRepository playerAccountRepository;
 
+    private final PlayerAccountMapper playerAccountMapper;
+
     public PlayerAccountService(){
         playerAccountRepository = PlayerAccountRepositoryFactory.getPlayerAccountRepository();
+        playerAccountMapper = PlayerAccountMapper.getInstance();
     }
 
+    /**
+     * Метод, создающий объект PlayerAccount
+     * @param createPlayerAccountDto - dto объект
+     * @return - объект PlayerAccount (счет пользователя) со сгенерированным номером
+     */
     public PlayerAccount createAccountPlayer(CreatePlayerAccountDto createPlayerAccountDto){
-        return playerAccountRepository.save(createPlayerAccountDto)
+        PlayerAccount playerAccount = playerAccountMapper.map(createPlayerAccountDto);
+        return playerAccountRepository.save(playerAccount)
                 .orElseThrow(() -> new PlayerAccountException("Аккаунт не создан"));
     }
 
+    /**
+     * Метод для получения счета по номеру
+     * @param accountNumber - номер счета
+     * @return - объект PlayerAccount (счет пользователя)
+     */
     public PlayerAccount getAccountByNumber(Long accountNumber){
         return playerAccountRepository.findAccountByNumber(accountNumber)
                 .orElseThrow(() -> new PlayerAccountException("Аккаунт не найден"));
     }
+
+    /**
+     * Метод для получения счета по id
+     * @param playerId - id пользователя
+     * @return - объект PlayerAccount (счет пользователя)
+     */
 
     public PlayerAccount getAccountByPlayerId(int playerId){
         return playerAccountRepository.findAccountByPlayerId(playerId)
                 .orElseThrow(() -> new PlayerAccountException("Аккаунт не найден"));
     }
 
+    /**
+     * Метод для изменения баланса по номеру счета
+     * @param balance - баланс пользователя
+     * @param accountNumber - номер счета пользователя
+     */
     public void updateBalanceByAccountNumber(BigDecimal balance, long accountNumber){
         playerAccountRepository.updateBalanceByAccountNumber(balance, accountNumber);
     }

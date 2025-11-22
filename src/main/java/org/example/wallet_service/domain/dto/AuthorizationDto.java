@@ -5,6 +5,11 @@ import lombok.Data;
 
 @Data
 @Builder
+
+/**
+ * dto объект для авторизации
+ */
+
 public class AuthorizationDto {
     private String username;
     private String password;

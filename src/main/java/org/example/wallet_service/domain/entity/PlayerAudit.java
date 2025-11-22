@@ -14,9 +14,25 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+
+/**
+ * Сущность - Логи пользователя
+ */
 public class PlayerAudit {
+    /**
+     * id лога, генерируемый при вставке экземпляра класса в БД
+     */
     private Integer id;
+    /**
+     * Дата и время, генерируемое при вставке экземпляра класса в БД
+     */
     private LocalDateTime dateTime;
+    /**
+     * Тип активности
+     */
     private AuditAction action;
+    /**
+     * id пользователя, к которому привязана активность
+     */
     private Integer playerId;
 }

@@ -16,25 +16,25 @@ public class PlayerRepository {
     public static final String PLAYER_SELECT = """
             SELECT * FROM wallet_schema.player WHERE username = ? AND password = ?;
             """;
-    public static final String PLAYER_SELECT_BY_ID = """
-            SELECT * FROM wallet_schema.player WHERE id = ?;
+    public static final String PLAYER_SELECT_BY_USERNAME = """
+            SELECT * FROM wallet_schema.player WHERE username = ?;
             """;
-    public Optional<Player> save(CreatePlayerDto createPlayerDto){
+
+    /**
+     * Метод, вставляющий объект Player в БД
+     * @param player - объект Player
+     * @return - объект Player со сгенерированным id
+     */
+    public Optional<Player> save(Player player){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_INSERT_VALUES,Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setObject(1, createPlayerDto.getName());
-            preparedStatement.setObject(2,createPlayerDto.getUsername());
-            preparedStatement.setObject(3,createPlayerDto.getPassword());
+            preparedStatement.setObject(1, player.getName());
+            preparedStatement.setObject(2,player.getUsername());
+            preparedStatement.setObject(3,player.getPassword());
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            Player player = null;
             if(generatedKeys.next()){
-                player = Player.builder()
-                        .id(generatedKeys.getObject("id", Integer.class))
-                        .name(createPlayerDto.getName())
-                        .username(createPlayerDto.getUsername())
-                        .password(createPlayerDto.getPassword())
-                        .build();
+                player.setId(generatedKeys.getObject("id", Integer.class));
             }
             return Optional.ofNullable(player);
         } catch (SQLException e) {
@@ -42,20 +42,26 @@ public class PlayerRepository {
         }
     }
 
-    public Optional<Player> findByUsernameAndPassword(AuthorizationDto authorizationDto){
+    /**
+     * Метод для авторизации, запрашивающий пользователя с переданным логином и паролем в БД
+     * @param username - логин пользователя
+     * @param password - пароль пользователя
+     * @return - объект Player
+     */
+    public Optional<Player> findByUsernameAndPassword(String username, String password){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_SELECT)) {
-            preparedStatement.setObject(1, authorizationDto.getUsername());
-            preparedStatement.setObject(2, authorizationDto.getPassword());
+            preparedStatement.setObject(1, username);
+            preparedStatement.setObject(2, password);
             ResultSet resultSet = preparedStatement.executeQuery();
             Player player = null;
             if(resultSet.next()){
                 player = Player.builder()
-                        .id(resultSet.getObject("id", Integer.class))
-                        .name(resultSet.getObject("name", String.class))
-                        .username(resultSet.getObject("username", String.class))
-                        .password(resultSet.getObject("password", String.class))
-                        .build();
+                       .id(resultSet.getObject("id", Integer.class))
+                       .name(resultSet.getObject("name", String.class))
+                       .username(resultSet.getObject("username", String.class))
+                       .password(resultSet.getObject("password", String.class))
+                       .build();
             }
             return Optional.ofNullable(player);
         } catch (SQLException e) {
@@ -63,18 +69,20 @@ public class PlayerRepository {
         }
     }
 
-    public Optional<Player> findPlayerById(Integer id){
+    /**
+     * Метод, запрашивающий пользователя с переданным логином в БД
+     * @param username - логин пользователя
+     * @return - объект Player
+     */
+    public Optional<Player> findByUsername(String username){
         try (Connection connection = ConnectionManager.open();
-             PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_SELECT_BY_ID)) {
-            preparedStatement.setObject(1, id);
+             PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_SELECT_BY_USERNAME)) {
+            preparedStatement.setObject(1, username);
             ResultSet resultSet = preparedStatement.executeQuery();
             Player player = null;
             if(resultSet.next()){
                 player = Player.builder()
-                        .id(resultSet.getObject("id", Integer.class))
-                        .name(resultSet.getObject("name", String.class))
                         .username(resultSet.getObject("username", String.class))
-                        .password(resultSet.getObject("password", String.class))
                         .build();
             }
             return Optional.ofNullable(player);

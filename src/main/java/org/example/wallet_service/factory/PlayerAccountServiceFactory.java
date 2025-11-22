@@ -2,6 +2,9 @@ package org.example.wallet_service.factory;
 
 import org.example.wallet_service.service.PlayerAccountService;
 
+/**
+ * Данный класс отвечает за создание единственного экземпляра класса PlayerAccountService
+ */
 public class PlayerAccountServiceFactory {
     private static PlayerAccountService playerAccountService;
 

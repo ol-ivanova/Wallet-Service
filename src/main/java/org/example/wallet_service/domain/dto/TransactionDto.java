@@ -9,6 +9,10 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
+
+/**
+ * dto объект для сущности Transaction
+ */
 public class TransactionDto {
     private TransactionType type;
     private BigDecimal sum;

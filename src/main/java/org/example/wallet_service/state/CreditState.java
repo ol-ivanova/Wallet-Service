@@ -14,15 +14,34 @@ import org.example.wallet_service.util.SelectionUtil;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
+/**
+ * Состояние - кредит операции
+ */
 public class CreditState implements ConsoleState {
-    private final Scanner scanner;
+
     /**
-     * следующее состояние приложения
+     * Объект сканнера
+     */
+    private final Scanner scanner;
+
+    /**
+     * Следующее состояние приложения
      */
     private ConsoleState nextState;
 
+    /**
+     * Объект класса PlayerAccount
+     */
     private PlayerAccount playerAccount;
+
+    /**
+     * Сервис для работы со счетом пользователя
+     */
     private PlayerAccountService playerAccountService;
+
+    /**
+     * Сервис для работы с транзакциями пользователя
+     */
     private TransactionService transactionService;
 
     public CreditState(PlayerAccount playerAccount) {
@@ -32,6 +51,9 @@ public class CreditState implements ConsoleState {
         this.playerAccount = playerAccount;
     }
 
+    /**
+     * Метод, запускающий логику процесса credit операций
+     */
     @Override
     public void process() {
         System.out.println("Укажите номер получателя");
@@ -65,6 +87,11 @@ public class CreditState implements ConsoleState {
         }
     }
 
+    /**
+     * Метод для фиксирования транзакции
+     * @param sum - сумма перевода
+     * @param playerAccount - аккаунт получателя
+     */
     private void createTransaction(BigDecimal sum , PlayerAccount playerAccount) {
         TransactionDto transactionDto = TransactionDto.builder()
                 .type(TransactionType.CREDIT)
@@ -77,6 +104,10 @@ public class CreditState implements ConsoleState {
         System.out.println("Перевод выполнен");
     }
 
+    /**
+     * Метод, возвращающий следующее состояние приложения
+     * @return - следующее состояние приложения
+     */
     @Override
     public ConsoleState nextState() {
         return nextState;

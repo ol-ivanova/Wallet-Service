@@ -2,6 +2,9 @@ package org.example.wallet_service.factory;
 
 import java.util.Scanner;
 
+/**
+ * Данный класс отвечает за создание единственного экземпляра класса Scanner
+ */
 public class ConsoleFactory {
     private static Scanner scanner;
 

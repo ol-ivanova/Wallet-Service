@@ -28,18 +28,21 @@ public class PlayerAccountRepository {
     public static final String UPDATE_BALANCE_BY_ACCOUNT_NUMBER = """
             UPDATE wallet_schema.player_account SET balance = ? WHERE account_number = ?;
             """;
-    public Optional<PlayerAccount> save(CreatePlayerAccountDto createPlayerAccountDto){
+
+    /**
+     * Метод, вставляющий объект PlayerAccount в БД
+     * @param playerAccount - объект PlayerAccount
+     * @return - объект PlayerAccount со сгенерированным номером счета
+     */
+    public Optional<PlayerAccount> save(PlayerAccount playerAccount){
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(PLAYER_ACCOUNT_INSERT_VALUES, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setObject(1, createPlayerAccountDto.getPlayerId());
-            preparedStatement.setObject(2, createPlayerAccountDto.getBalance());
+            preparedStatement.setObject(1, playerAccount.getPlayerId());
+            preparedStatement.setObject(2, playerAccount.getBalance());
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            PlayerAccount playerAccount = null;
             if(generatedKeys.next()){
-                playerAccount = PlayerAccount.builder()
-                        .accountNumber(generatedKeys.getObject("account_number", Long.class))
-                        .build();
+                playerAccount.setAccountNumber(generatedKeys.getObject("account_number", Long.class));
             }
             return Optional.ofNullable(playerAccount);
         } catch (SQLException e) {
@@ -47,6 +50,11 @@ public class PlayerAccountRepository {
         }
     }
 
+    /**
+     * Метод, запрашивающий счет из БД по номеру
+     * @param accountNumber - номер счета
+     * @return - объект PlayerAccount
+     */
 
     public Optional<PlayerAccount> findAccountByNumber(long accountNumber) {
         try (Connection connection = ConnectionManager.open();
@@ -58,9 +66,7 @@ public class PlayerAccountRepository {
                 playerAccount = PlayerAccount.builder()
                         .accountNumber(resultSet.getObject("account_number", Long.class))
                         .balance(resultSet.getObject("balance", BigDecimal.class))
-                        .player(playerRepository.findPlayerById(
-                                        resultSet.getObject("player_id", Integer.class))
-                                .orElse(null))
+                        .playerId(resultSet.getObject("player_id", Integer.class))
                         .build();
             }
             return Optional.ofNullable(playerAccount);
@@ -69,6 +75,12 @@ public class PlayerAccountRepository {
         }
 
     }
+
+    /**
+     * Метод, запрашивающий счет из БД по id пользователя
+     * @param playerId - id пользователя
+     * @return - объект PlayerAccount
+     */
 
     public Optional<PlayerAccount> findAccountByPlayerId(int playerId) {
         try (Connection connection = ConnectionManager.open();
@@ -80,9 +92,7 @@ public class PlayerAccountRepository {
                 playerAccount = PlayerAccount.builder()
                         .accountNumber(resultSet.getObject("account_number", Long.class))
                         .balance(resultSet.getObject("balance", BigDecimal.class))
-                        .player(playerRepository.findPlayerById(
-                                        resultSet.getObject("player_id", Integer.class))
-                                .orElse(null))
+                        .playerId(resultSet.getObject("player_id", Integer.class))
                         .build();
             }
             return Optional.ofNullable(playerAccount);
@@ -90,6 +100,12 @@ public class PlayerAccountRepository {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Метод для изменения баланса пользователя по номеру счета
+     * @param balance - значение баланса, на которое нужно изменить
+     * @param accountNumber - номер счета
+     */
 
     public void updateBalanceByAccountNumber(BigDecimal balance, long accountNumber) {
         try (Connection connection = ConnectionManager.open();
